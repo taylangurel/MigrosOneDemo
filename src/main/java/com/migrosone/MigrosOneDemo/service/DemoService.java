@@ -1,36 +1,92 @@
 package com.migrosone.MigrosOneDemo.service;
 
-import com.migrosone.MigrosOneDemo.controller.model.CourierInfoModel;
+import com.migrosone.MigrosOneDemo.model.CourierEntry;
+import com.migrosone.MigrosOneDemo.model.CourierInfoModel;
+import com.migrosone.MigrosOneDemo.model.StoreInfoModel;
+import com.migrosone.MigrosOneDemo.util.CourierTrackingUtil;
+import com.migrosone.MigrosOneDemo.util.GeoUtil;
+import com.migrosone.MigrosOneDemo.util.JsonReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 @Service
 @RequiredArgsConstructor
 public class DemoService {
 
+    private static HashMap<StoreInfoModel, List<CourierEntry>> within100MStores = new HashMap<>();
+    List<StoreInfoModel> stores = JsonReader.readJsonFile();
+    private CourierTrackingUtil courierTrackingUtil = new CourierTrackingUtil();
+
+    private static void logCourierAndStoreDetails(CourierInfoModel courierInfoModel) {
+        System.out.println("Courier: " + courierInfoModel);
+        for (Map.Entry<StoreInfoModel, List<CourierEntry>> entry : within100MStores.entrySet()) {
+            System.out.println("Store: " + entry.getKey());
+            for (CourierEntry courierEntry : entry.getValue()) {
+                System.out.println("    CourierEntry: " + courierEntry);
+            }
+        }
+    }
+
+    private static boolean isWithinRadius(CourierInfoModel courierInfoModel, StoreInfoModel store) {
+        double radius = 100;
+
+        return GeoUtil.isWithinRadius(
+                Double.parseDouble(store.getLat()),
+                Double.parseDouble(store.getLng()),
+                Double.parseDouble(courierInfoModel.getLat()),
+                Double.parseDouble(courierInfoModel.getLng()),
+                radius);
+    }
+
+    // Method to get total travel distance for a given courier
+    public Double getTotalTravelDistance(String courier) {
+        return courierTrackingUtil.getTotalTravelDistance(courier);
+    }
+
+    // Method to process the given courier info
+    //Logs the courier and store information and returns the processed courier
     public CourierInfoModel addCourierInfo(CourierInfoModel courierInfoModel) {
 
-        UUID uniqueId = UUID.randomUUID();
-        String truncatedId = uniqueId.toString().replace("-", "").substring(0, 10);
-        courierInfoModel.setCourier(truncatedId);
+        stores.forEach(store -> {
+            if (isWithinRadius(courierInfoModel, store)) {
+                Timestamp currentTimeOfTheCourier = courierInfoModel.getTime();
 
-        Instant now = Instant.now();
-        Timestamp timestamp = Timestamp.from(now);
-        courierInfoModel.setTime(timestamp);
+                // Get or create the list of courier entries for the store
+                List<CourierEntry> courierEntries = within100MStores
+                        .computeIfAbsent(store, k -> new ArrayList<>());
 
-        String latitude = "40.992827";
-        courierInfoModel.setLat(latitude);
-        String longitude = "29.126828";
-        courierInfoModel.setLng(longitude);
+                // Check if the courier has entered this store's radius before
+                boolean canAdd = true;
+                for (CourierEntry entry : courierEntries) {
+                    if (entry.getCourierInfoModel().getCourier().equals(courierInfoModel.getCourier())) {
+                        long timeDifference = currentTimeOfTheCourier.getTime() - entry.getLastEntry().getTime();
+                        if (timeDifference <= 60000) {
+                            // Skip adding this courier as the reentry is within 1 minute
+                            canAdd = false;
+                            break;
+                        }
+                    }
+                }
 
-        System.out.println("Courier: " + courierInfoModel.getCourier());
-        System.out.println("Courier Time: " + courierInfoModel.getTime());
-        System.out.println("Courier Latitude: " + courierInfoModel.getLat());
-        System.out.println("Courier Longitude: " + courierInfoModel.getLng());
+                if (canAdd) {
+                    // Add the courier entry to the list for this store
+                    courierEntries.add(new CourierEntry(courierInfoModel, currentTimeOfTheCourier));
+                }
+
+                // Update the courier's travel distance
+                String courier = courierInfoModel.getCourier();
+                courierTrackingUtil.updateCourierLocation(courier, Double.parseDouble(courierInfoModel.getLat()), Double.parseDouble(courierInfoModel.getLng()));
+            }
+        });
+
+        logCourierAndStoreDetails(courierInfoModel);
 
         return courierInfoModel;
     }
