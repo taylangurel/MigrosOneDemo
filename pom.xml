@@ -10,7 +10,8 @@
 	</parent>
 	<groupId>com.migrosone</groupId>
 	<artifactId>MigrosOneDemo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
 	<name>MigrosOneDemo</name>
 	<description>Demo project for MigrosOne</description>
 	<properties>
@@ -47,7 +48,7 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.8.8</version>
+			<version>2.8.9</version>
 		</dependency>
 
 	</dependencies>
