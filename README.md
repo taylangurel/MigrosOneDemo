@@ -9,7 +9,7 @@ This is a demo project for Migros One. The functionality provided by this projec
 - Any API platform to send requests and receive answers from the provided API (like [Postman](https://www.postman.com/))
 
 ### How to run?
-- Install the provided JAR file
+- Install the provided JAR file (Releases > Release v1 > Download MigrosOneDemo-1.0.0.jar)
 - Open the terminal and navigate to the directory which the JAR file is located
 ```bash 
 cd path/to/your/jar
