@@ -16,7 +16,7 @@ cd path/to/your/jar
 ```
 - Run the JAR file with 
 ```bash 
-java -jar courier-service-1.0.0.jar
+java -jar MigrosOneDemo-1.0.0.jar
 ```
 
 ## Endpoints
