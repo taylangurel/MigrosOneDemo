@@ -5,7 +5,7 @@ This is a demo project for Migros One. The functionality provided by this projec
 
 ## Installation
 ### Prerequisites
-- JDK17 for running the project on local machine
+- [JDK17](https://www.oracle.com/java/technologies/downloads/#jdk17-windows) for running the project on local machine
 - Any API platform to send requests and receive answers from the provided API (like [Postman](https://www.postman.com/))
 
 ### How to run?
@@ -18,7 +18,8 @@ cd path/to/your/jar
 ```bash 
 java -jar MigrosOneDemo-1.0.0.jar
 ```
-
+- Run any API platform to trigger the requests and provoke the API endpoints
+  
 ## Endpoints
 Detailed list of the available endpoints, including request methods, URLs, and descriptions.
 
