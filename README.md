@@ -22,11 +22,76 @@ java -jar courier-service-1.0.0.jar
 ## Endpoints
 Detailed list of the available endpoints, including request methods, URLs, and descriptions.
 
-#### Example:
-- GET /getCourierTotalDistance?courier={input} - Retrieves the total distance traveled by the {input}
-- POST /addCourierInfo - Logs the input courier and stores if courier enters radius of 100 meters from Migros
-  stores. Reentries to the same store's circumference over 1 minute does not count
-  as "entrance".  
+### GET /getCourierTotalDistance?courier={input}
+#### Retrieves the total distance traveled by the {input}
+- Example Request (as curl):
+```
+curl --location 'http://localhost:8080/getCourierTotalDistance?courier=Taylan' \--header 'Content-Type: application/json'
+```
+- Example Response:
+```
+ "Total Distance traveled by Taylan is 0.02786287536943298 meters."
+```
+
+### POST /addCourierInfo
+#### Logs the input courier and stores if courier enters radius of 100 meters from Migros stores. Reentries to the same store's circumference over 1 minute does not count as "entrance".  
+- Examle Request (as curl): 
+```
+curl --location 'http://localhost:8080/addCourierInfo' \
+--header 'Content-Type: application/json' \
+--data 
+'{
+    "time": "2024-05-26T09:17:19.227+00:00",
+    "courier": "Taylan",
+    "lat": "40.9923307", 
+    "lng": "29.1244227" 
+}'
+```
+- Example Response:
+```
+{
+    "StoreInfoModel(name=Novada MMM Migros, lat=40.986106, lng=29.1161293)": [
+        {
+            "courierInfoModel": {
+                "time": "2024-05-26T09:17:19.227+00:00",
+                "courier": "Ellie",
+                "lat": "40.986105",
+                "lng": "29.1161295"
+            },
+            "lastEntry": "2024-05-26T09:17:19.227+00:00"
+        },
+        {
+            "courierInfoModel": {
+                "time": "2024-05-26T09:17:19.227+00:00",
+                "courier": "John",
+                "lat": "40.986105",
+                "lng": "29.1161295"
+            },
+            "lastEntry": "2024-05-26T09:17:19.227+00:00"
+        }
+    ],
+    "StoreInfoModel(name=Ataşehir MMM Migros, lat=40.9923307, lng=29.1244229)": [
+        {
+            "courierInfoModel": {
+                "time": "2024-05-26T09:17:19.227+00:00",
+                "courier": "Ahmet",
+                "lat": "40.9923305",
+                "lng": "29.1244225"
+            },
+            "lastEntry": "2024-05-26T09:17:19.227+00:00"
+        },
+        {
+            "courierInfoModel": {
+                "time": "2024-05-26T09:17:19.227+00:00",
+                "courier": "Taylan",
+                "lat": "40.9923305",
+                "lng": "29.1244225"
+            },
+            "lastEntry": "2024-05-26T09:17:19.227+00:00"
+        }
+    ]
+}
+  ```
 
 ## Tools Used
 

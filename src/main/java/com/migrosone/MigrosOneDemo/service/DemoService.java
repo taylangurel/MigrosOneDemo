@@ -37,12 +37,19 @@ public class DemoService {
     private static boolean isWithinRadius(CourierInfoModel courierInfoModel, StoreInfoModel store) {
         double radius = 100;
 
-        return GeoUtil.isWithinRadius(
+        boolean result = GeoUtil.isWithinRadius(
                 Double.parseDouble(store.getLat()),
                 Double.parseDouble(store.getLng()),
                 Double.parseDouble(courierInfoModel.getLat()),
                 Double.parseDouble(courierInfoModel.getLng()),
                 radius);
+
+        if (result)
+            System.out.println(courierInfoModel.getCourier() + " is within " + radius + " M radius of " + store.getName());
+        else
+            System.out.println(courierInfoModel.getCourier() + " is not within " + radius + " M radius of " + store.getName());
+
+        return result;
     }
 
     // Method to get total travel distance for a given courier
@@ -52,7 +59,7 @@ public class DemoService {
 
     // Method to process the given courier info
     //Logs the courier and store information and returns the processed courier
-    public CourierInfoModel addCourierInfo(CourierInfoModel courierInfoModel) {
+    public HashMap<StoreInfoModel, List<CourierEntry>> addCourierInfo(CourierInfoModel courierInfoModel) {
 
         stores.forEach(store -> {
             if (isWithinRadius(courierInfoModel, store)) {
@@ -88,6 +95,6 @@ public class DemoService {
 
         logCourierAndStoreDetails(courierInfoModel);
 
-        return courierInfoModel;
+        return within100MStores;
     }
 }
